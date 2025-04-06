@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spinnaker Resorts FollowUpPro - Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #FFFFFF; /* White background */
+            color: #1A3C5A; /* Deep blue from logo for text */
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: #FFFFFF;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header img {
+            max-width: 300px;
+            height: auto;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .tab-btn {
+            flex: 1 1 100px;
+            padding: 12px;
+            background: #1A3C5A; /* Deep blue from logo */
+            color: #FFFFFF; /* White font */
+            font-weight: bold;
+            border-radius: 8px;
+            border: 2px solid #8B0000; /* Dark red border */
+            transition: transform 0.2s, background 0.3s;
+            cursor: pointer;
+        }
+        .tab-btn:hover, .tab-btn.active {
+            background: #FFFFFF;
+            color: #1A3C5A;
+            border: 2px solid #8B0000;
+            transform: scale(1.05);
+        }
+        .tab {
+            display: none;
+            background: #F5F5F5; /* Light gray for tab background */
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            color: #1A3C5A;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .tab.active {
+            display: block;
+        }
+        .task-group, .sales-item {
+            background: #FFFFFF;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .task-group h3 {
+            color: #1A3C5A;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .task-item {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .dashboard-stat {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1A3C5A;
+            margin: 10px 0;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #1A3C5A;
+            border-radius: 5px;
+            color: #1A3C5A;
+            box-sizing: border-box;
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background: #1A3C5A; /* Deep blue from logo */
+            color: #FFFFFF; /* White font */
+            font-weight: bold;
+            border-radius: 5px;
+            border: 2px solid #8B0000; /* Dark red border */
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            background: #FFFFFF;
+            color: #1A3C5A;
+            border: 2px solid #8B0000;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 640px) {
+            .header img { max-width: 200px; }
+            .tab-btn { flex: 1 1 80px; font-size: 0.9rem; }
+            .container { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="followupprologo.png" alt="Spinnaker Resorts FollowUpPro Logo">
+    </div>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('crm')">CRM Entry</button>
+            <button class="tab-btn" onclick="showTab('tasks')">Daily Tasks</button>
+            <button class="tab-btn" onclick="showTab('dashboard')">Dashboard</button>
+        </div>
+
+        <!-- CRM Entry Tab -->
+        <div id="crm" class="tab active">
+            <h2 class="text-xl font-semibold mb-4">Add New Customer</h2>
+            <form id="crmForm">
+                <input type="text" id="firstName" placeholder="First Name" required>
+                <input type="text" id="lastName" placeholder="Last Name" required>
+                <input type="tel" id="phone" placeholder="Phone Number" required>
+                <input type="date" id="saleDate" required>
+                <input type="number" id="volume" placeholder="Sale Volume" step="0.01" required>
+                <input type="text" id="to" placeholder="TO/Manager" required>
+                <select id="salesRep" required>
+                    <option value="" disabled selected>Select Sales Rep</option>
+                    <option value="John Doe">John Doe</option>
+                    <option value="Jane Smith">Jane Smith</option>
+                    <option value="Mike Johnson">Mike Johnson</option>
+                    <!-- Add more reps as needed -->
+                </select>
+                <textarea id="notes" placeholder="Notes"></textarea>
+                <button type="submit">Add Customer</button>
+            </form>
+        </div>
+
+        <!-- Daily Tasks Tab -->
+        <div id="tasks" class="tab">
+            <h2 class="text-xl font-semibold mb-4">Daily Follow-Up Tasks</h2>
+            <div id="taskList"></div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab">
+            <h2 class="text-xl font-semibold mb-4">Monthly Dashboard</h2>
+            <div id="dashboardStats"></div>
+            <div id="salesList" class="mt-4"></div>
+        </div>
+    </div>
+
+    <script>
+        const managerEmail = "manager@example.com"; // Simulate manager access
+        let customers = JSON.parse(localStorage.getItem("customers")) || [];
+
+        // Tab Navigation
+        function showTab(tabId) {
+            document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+            document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+            document.getElementById(tabId).classList.add("active");
+            document.querySelector(`button[onclick="showTab('${tabId}')"]`).classList.add("active");
+            if (tabId === "tasks") updateTasks();
+            if (tabId === "dashboard") updateDashboard();
+        }
+
+        // CRM Form Submission
+        document.getElementById("crmForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const customer = {
+                firstName: document.getElementById("firstName").value,
+                lastName: document.getElementById("lastName").value,
+                phone: document.getElementById("phone").value,
+                saleDate: document.getElementById("saleDate").value || new Date().toISOString().split("T")[0],
+                volume: parseFloat(document.getElementById("volume").value),
+                to: document.getElementById("to").value,
+                salesRep: document.getElementById("salesRep").value,
+                notes: document.getElementById("notes").value,
+                managerEmail: managerEmail
+            };
+            customers.push(customer);
+            localStorage.setItem("customers", JSON.stringify(customers));
+            e.target.reset();
+            alert("Customer added successfully!");
+        });
+
+        // Update Daily Tasks (Grouped by Sales Rep)
+        function updateTasks() {
+            const today = new Date();
+            const taskList = document.getElementById("taskList");
+            taskList.innerHTML = "";
+            const tasks = customers.filter(c => {
+                const saleDate = new Date(c.saleDate);
+                const diffDays = Math.floor((today - saleDate) / (1000 * 60 * 60 * 24));
+                return [1, 3, 7].includes(diffDays) && c.managerEmail === managerEmail;
+            });
+
+            // Group tasks by sales rep
+            const groupedTasks = {};
+            tasks.forEach(task => {
+                if (!groupedTasks[task.salesRep]) groupedTasks[task.salesRep] = [];
+                groupedTasks[task.salesRep].push(task);
+            });
+
+            // Display grouped tasks
+            Object.keys(groupedTasks).sort().forEach(rep => {
+                const repTasks = groupedTasks[rep].sort((a, b) => a.lastName.localeCompare(b.lastName));
+                let taskHTML = `<div class="task-group"><h3>${rep}'s Tasks</h3>`;
+                repTasks.forEach((task, i) => {
+                    taskHTML += `
+                        <div class="task-item">
+                            <strong>${i + 1}. ${task.firstName} & ${task.lastName}</strong> – ${task.phone}<br>
+                            Volume: $${task.volume.toLocaleString()} | TO: ${task.to}<br>
+                            Notes: ${task.notes || "None"}
+                        </div>`;
+                });
+                taskHTML += `</div>`;
+                taskList.innerHTML += taskHTML;
+            });
+        }
+
+        // Update Dashboard
+        function updateDashboard() {
+            const today = new Date();
+            const thisMonth = customers.filter(c => {
+                const saleDate = new Date(c.saleDate);
+                return saleDate.getMonth() === today.getMonth() && saleDate.getFullYear() === today.getFullYear() && c.managerEmail === managerEmail;
+            });
+            const salesCount = thisMonth.length;
+            const totalVolume = thisMonth.reduce((sum, c) => sum + c.volume, 0);
+            const avgSale = salesCount ? (totalVolume / salesCount).toFixed(2) : 0;
+
+            document.getElementById("dashboardStats").innerHTML = `
+                <div class="dashboard-stat">Sales: ${salesCount}</div>
+                <div class="dashboard-stat">Total Volume: $${totalVolume.toLocaleString()}</div>
+                <div class="dashboard-stat">Avg Sale: $${avgSale}</div>
+            `;
+
+            const salesList = document.getElementById("salesList");
+            salesList.innerHTML = "";
+            thisMonth
+                .sort((a, b) => b.volume - a.volume || a.lastName.localeCompare(b.lastName))
+                .forEach((sale, i) => {
+                    salesList.innerHTML += `
+                        <div class="sales-item">
+                            ${i + 1}. ${sale.lastName}, ${sale.firstName} – $${sale.volume.toLocaleString()} – ${sale.saleDate} (Rep: ${sale.salesRep})
+                        </div>`;
+                });
+        }
+
+        // Initialize
+        showTab("crm");
+    </script>
+</body>
+</html>
